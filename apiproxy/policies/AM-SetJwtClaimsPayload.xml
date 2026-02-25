@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage name="AM-SetJwtClaimsPayload">
+    <DisplayName>AM - Set JWT Claims Payload</DisplayName>
+    <AssignVariable>
+        <Name>jwt.claims.json</Name>
+        <Ref>request.content</Ref>
+    </AssignVariable>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</AssignMessage>
