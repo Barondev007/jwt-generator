@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+    Calls the external signing service to sign the JWT.
+
+    Sends the signing string (base64header.base64payload) in a JSON body
+    with the Bearer JWT token from the identity provider in the Authorization header.
+
+    The signing service response is stored in signingServiceResponse for
+    further processing (e.g., extracting the signature and assembling the final JWS).
+-->
+<ServiceCallout name="SC-CallSigningService">
+    <DisplayName>SC - Call Signing Service</DisplayName>
+    <Request variable="signingServiceRequest"/>
+    <Response>signingServiceResponse</Response>
+    <HTTPTargetConnection>
+        <URL>{private.signing.service.url}</URL>
+    </HTTPTargetConnection>
+</ServiceCallout>

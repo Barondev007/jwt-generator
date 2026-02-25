@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+    Builds the request to the external signing service.
+
+    Sets:
+      - Authorization header with the Bearer JWT token obtained from the IdP
+      - JSON body with the signing string: {"signingInput": "base64header.base64payload"}
+-->
+<AssignMessage name="AM-BuildSigningServiceRequest">
+    <DisplayName>AM - Build Signing Service Request</DisplayName>
+    <AssignTo createNew="true" type="request">signingServiceRequest</AssignTo>
+    <Set>
+        <Headers>
+            <Header name="Content-Type">application/json</Header>
+            <Header name="Authorization">Bearer {private.idp.access.token}</Header>
+        </Headers>
+        <Payload contentType="application/json">{"signingInput": "{jwt_signing_string}"}</Payload>
+        <Verb>POST</Verb>
+    </Set>
+</AssignMessage>

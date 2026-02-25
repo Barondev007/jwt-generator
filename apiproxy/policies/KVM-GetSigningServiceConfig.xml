@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+    Reads signing service and identity provider configuration from the
+    environment-scoped KVM "jwt-signing-config".
+
+    Retrieved values:
+      - idp.token.url        → Identity provider token endpoint URL
+      - idp.client.id        → OAuth2 client_id for the IdP
+      - idp.client.secret    → OAuth2 client_secret for the IdP
+      - idp.keystore.name    → Apigee keystore name for mTLS certificate
+      - idp.keyalias.name    → Key alias within the keystore
+      - signing.service.url  → External signing service endpoint URL
+
+    The keystore/keyalias values depend on the flow and determine which
+    certificate is used for mTLS with the identity provider.
+-->
+<KeyValueMapOperations name="KVM-GetSigningServiceConfig"
+                       mapIdentifier="jwt-signing-config"
+                       continueOnError="true">
+    <DisplayName>KVM - Get Signing Service Config</DisplayName>
+    <ExpiryTimeInSecs>300</ExpiryTimeInSecs>
+    <Scope>environment</Scope>
+
+    <Get assignTo="private.idp.token.url">
+        <Key>
+            <Parameter>idp.token.url</Parameter>
+        </Key>
+    </Get>
+
+    <Get assignTo="private.idp.client.id">
+        <Key>
+            <Parameter>idp.client.id</Parameter>
+        </Key>
+    </Get>
+
+    <Get assignTo="private.idp.client.secret">
+        <Key>
+            <Parameter>idp.client.secret</Parameter>
+        </Key>
+    </Get>
+
+    <Get assignTo="private.idp.keystore.name">
+        <Key>
+            <Parameter>idp.keystore.name</Parameter>
+        </Key>
+    </Get>
+
+    <Get assignTo="private.idp.keyalias.name">
+        <Key>
+            <Parameter>idp.keyalias.name</Parameter>
+        </Key>
+    </Get>
+
+    <Get assignTo="private.signing.service.url">
+        <Key>
+            <Parameter>signing.service.url</Parameter>
+        </Key>
+    </Get>
+
+</KeyValueMapOperations>

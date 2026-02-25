@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+    Extracts the access_token from the identity provider OAuth2 response.
+
+    Expected IdP response format:
+      {"access_token": "eyJ...", "token_type": "Bearer", "expires_in": 3600}
+
+    The extracted token is stored in private.idp.access.token and will be
+    used as the Bearer token in the Authorization header when calling the
+    signing service.
+-->
+<ExtractVariables name="EV-ExtractIdpToken">
+    <DisplayName>EV - Extract IdP Token</DisplayName>
+    <Source>idpTokenResponse</Source>
+    <JSONPayload>
+        <Variable name="private.idp.access.token">
+            <JSONPath>$.access_token</JSONPath>
+        </Variable>
+    </JSONPayload>
+</ExtractVariables>

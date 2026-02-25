@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+    Calls the identity provider token endpoint using OAuth2 client_credentials
+    grant with mutual TLS (mTLS).
+
+    The keystore and key alias are read from KVM and determine which client
+    certificate is presented during the TLS handshake. This allows different
+    flows/APIs to use different certificates.
+
+    The IdP is expected to return a standard OAuth2 response:
+      {"access_token": "...", "token_type": "Bearer", ...}
+
+    The response is stored in idp.token.response for extraction by the
+    EV-ExtractIdpToken policy.
+-->
+<ServiceCallout name="SC-GetIdpToken">
+    <DisplayName>SC - Get IdP Token</DisplayName>
+    <Request variable="idpTokenRequest">
+        <Set>
+            <Headers>
+                <Header name="Content-Type">application/x-www-form-urlencoded</Header>
+            </Headers>
+            <Payload contentType="application/x-www-form-urlencoded">grant_type=client_credentials&amp;client_id={private.idp.client.id}&amp;client_secret={private.idp.client.secret}</Payload>
+            <Verb>POST</Verb>
+        </Set>
+    </Request>
+    <Response>idpTokenResponse</Response>
+    <HTTPTargetConnection>
+        <URL>{private.idp.token.url}</URL>
+        <SSLInfo>
+            <Enabled>true</Enabled>
+            <ClientAuthEnabled>true</ClientAuthEnabled>
+            <KeyStore>{private.idp.keystore.name}</KeyStore>
+            <KeyAlias>{private.idp.keyalias.name}</KeyAlias>
+        </SSLInfo>
+    </HTTPTargetConnection>
+</ServiceCallout>
