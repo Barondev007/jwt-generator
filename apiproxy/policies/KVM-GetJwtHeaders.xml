@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+    Reads JWT JOSE header parameters from the environment-scoped KVM "jwt-signing-config".
+
+    Each KVM entry maps to a JOSE header name/value. Add or remove <Get> entries
+    per API depending on which headers are needed. The retrieved values are stored
+    in private flow variables (private.jwt.header.*) and then referenced by the
+    JC-BuildJwtSigningString Java Callout.
+
+    continueOnError="true" allows missing KVM keys to be silently ignored.
+    The Java Callout skips any header whose flow variable resolved to null/empty.
+
+    Example KVM entries:
+      kid  → "my-key-id-2024"
+      alg  → "RS256"
+      x5u  → "https://example.com/certs/signing.pem"
+      typ  → "JWT"
+-->
+<KeyValueMapOperations name="KVM-GetJwtHeaders"
+                       mapIdentifier="jwt-signing-config"
+                       async="false"
+                       continueOnError="true"
+                       enabled="true">
+    <DisplayName>KVM - Get JWT Headers</DisplayName>
+    <ExpiryTimeInSecs>300</ExpiryTimeInSecs>
+    <Scope>environment</Scope>
+
+    <Get assignTo="private.jwt.header.kid">
+        <Key>
+            <Parameter>kid</Parameter>
+        </Key>
+    </Get>
+
+    <Get assignTo="private.jwt.header.alg">
+        <Key>
+            <Parameter>alg</Parameter>
+        </Key>
+    </Get>
+
+    <Get assignTo="private.jwt.header.typ">
+        <Key>
+            <Parameter>typ</Parameter>
+        </Key>
+    </Get>
+
+    <Get assignTo="private.jwt.header.x5u">
+        <Key>
+            <Parameter>x5u</Parameter>
+        </Key>
+    </Get>
+
+</KeyValueMapOperations>

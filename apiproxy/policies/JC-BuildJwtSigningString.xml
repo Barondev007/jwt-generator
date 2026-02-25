@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+    Builds the JWT signing string (header.payload) using header values
+    retrieved from KVM via KVM-GetJwtHeaders.
+
+    The header_* properties reference the private.jwt.header.* flow variables
+    set by the KVM policy. Add or remove header_* properties to match the
+    <Get> entries in your KVM policy.
+-->
+<JavaCallout name="JC-BuildJwtSigningString"
+             async="false"
+             continueOnError="false"
+             enabled="true">
+    <DisplayName>JC - Build JWT Signing String</DisplayName>
+    <Properties>
+        <!-- JOSE Header parameters sourced from KVM flow variables -->
+        <Property name="header_alg">{private.jwt.header.alg}</Property>
+        <Property name="header_typ">{private.jwt.header.typ}</Property>
+        <Property name="header_kid">{private.jwt.header.kid}</Property>
+        <Property name="header_x5u">{private.jwt.header.x5u}</Property>
+
+        <!-- Critical headers (comma-separated, if needed) -->
+        <Property name="crit_headers">x5u</Property>
+
+        <!-- JWT payload from upstream (e.g. set by an AssignMessage or JS policy) -->
+        <Property name="payload">{jwt.claims.json}</Property>
+
+        <!-- Output variables -->
+        <Property name="output-variable">jwt_signing_string</Property>
+        <Property name="error-variable">jwt_error</Property>
+    </Properties>
+    <ClassName>com.apigeecs.callout.JwtSigningStringCallout</ClassName>
+    <ResourceURL>java://jwt-signing-string-callout-1.0.0.jar</ResourceURL>
+</JavaCallout>
