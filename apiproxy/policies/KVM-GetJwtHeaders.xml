@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!--
-    Reads JWT JOSE header parameters from the environment-scoped KVM "jwt-signing-config".
+    Reads JWT JOSE header parameters from a per-proxy environment-scoped KVM.
+
+    The KVM name is resolved dynamically from the calling API proxy name using
+    apiproxy.name, making this policy reusable in a shared flow.
+    Each proxy must have its own KVM named after the proxy (e.g., "my-api-proxy").
 
     Each KVM entry maps to a JOSE header name/value. Add or remove <Get> entries
-    per API depending on which headers are needed. The retrieved values are stored
+    depending on which headers are needed. The retrieved values are stored
     in private flow variables (private.jwt.header.*) and then referenced by the
     JC-BuildJwtSigningString Java Callout.
 
     continueOnError="true" allows missing KVM keys to be silently ignored.
     The Java Callout skips any header whose flow variable resolved to null/empty.
 
-    Example KVM entries:
+    Example KVM entries (in a KVM named after the proxy):
       kid  → "my-key-id-2024"
       alg  → "RS256"
       x5u  → "https://example.com/certs/signing.pem"
       typ  → "JWT"
 -->
 <KeyValueMapOperations name="KVM-GetJwtHeaders"
-                       mapIdentifier="jwt-signing-config"
-                       async="false"
-                       continueOnError="true"
-                       enabled="true">
+                       continueOnError="true">
     <DisplayName>KVM - Get JWT Headers</DisplayName>
+    <MapName ref="apiproxy.name"/>
     <ExpiryTimeInSecs>300</ExpiryTimeInSecs>
     <Scope>environment</Scope>
 
