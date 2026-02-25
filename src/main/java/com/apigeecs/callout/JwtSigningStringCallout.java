@@ -5,9 +5,8 @@ import com.apigee.flow.execution.ExecutionResult;
 import com.apigee.flow.execution.spi.Execution;
 import com.apigee.flow.message.MessageContext;
 
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -305,14 +304,45 @@ public class JwtSigningStringCallout implements Execution {
 
     /**
      * Encodes the given string using Base64URL encoding (no padding) per RFC 4648 Section 5.
+     * Uses a Java 7-compatible implementation (no {@code java.util.Base64}).
      *
      * @param input the string to encode
      * @return the Base64URL-encoded string without padding
      */
     static String base64UrlEncode(String input) {
-        return Base64.getUrlEncoder()
-                .withoutPadding()
-                .encodeToString(input.getBytes(StandardCharsets.UTF_8));
+        byte[] data;
+        try {
+            data = input.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // UTF-8 is guaranteed to be available on every JVM
+            throw new RuntimeException(e);
+        }
+
+        // Standard Base64 alphabet
+        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        StringBuilder sb = new StringBuilder((data.length * 4 + 2) / 3);
+
+        for (int i = 0; i < data.length; i += 3) {
+            int b0 = data[i] & 0xFF;
+            int b1 = (i + 1 < data.length) ? (data[i + 1] & 0xFF) : 0;
+            int b2 = (i + 2 < data.length) ? (data[i + 2] & 0xFF) : 0;
+
+            sb.append(alphabet.charAt(b0 >> 2));
+            sb.append(alphabet.charAt(((b0 & 0x03) << 4) | (b1 >> 4)));
+
+            if (i + 1 < data.length) {
+                sb.append(alphabet.charAt(((b1 & 0x0F) << 2) | (b2 >> 6)));
+            }
+            if (i + 2 < data.length) {
+                sb.append(alphabet.charAt(b2 & 0x3F));
+            }
+        }
+
+        // Convert to URL-safe: replace '+' with '-' and '/' with '_'
+        String result = sb.toString();
+        result = result.replace('+', '-').replace('/', '_');
+
+        return result;
     }
 
     /**
