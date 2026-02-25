@@ -1,13 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+    The header_* property values reference flow variable names directly.
+    The Java code reads these variables from the MessageContext at runtime,
+    avoiding any issues with Apigee property-level variable resolution.
+
+    Use "ref:" prefix to indicate a flow variable name to be looked up at runtime.
+    Without "ref:" the value is treated as a literal.
+-->
 <JavaCallout name="JC-BuildJwtSigningString">
     <DisplayName>JC - Build JWT Signing String</DisplayName>
     <Properties>
-        <Property name="header_alg">{private.jwt.header.alg}</Property>
-        <Property name="header_typ">{private.jwt.header.typ}</Property>
-        <Property name="header_kid">{private.jwt.header.kid}</Property>
-        <Property name="header_x5u">{private.jwt.header.x5u}</Property>
+        <Property name="header_alg">ref:private.jwt.header.alg</Property>
+        <Property name="header_typ">ref:private.jwt.header.typ</Property>
+        <Property name="header_kid">ref:private.jwt.header.kid</Property>
+        <Property name="header_x5u">ref:private.jwt.header.x5u</Property>
         <Property name="crit_headers">x5u</Property>
-        <Property name="payload">{jwt.claims.json}</Property>
+        <Property name="payload">ref:jwt.claims.json</Property>
         <Property name="output-variable">jwt_signing_string</Property>
         <Property name="error-variable">jwt_error</Property>
     </Properties>

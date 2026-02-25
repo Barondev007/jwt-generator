@@ -543,4 +543,125 @@ public class JwtSigningStringCalloutTest {
         assertNotNull(messageContext.getVariable("jwt_header_b64"));
         assertNotNull(messageContext.getVariable("jwt_payload_b64"));
     }
+
+    // ---------------------------------------------------------------
+    // ref: prefix tests — direct flow variable lookup
+    // ---------------------------------------------------------------
+
+    @Test
+    public void testRefPrefixResolvesFlowVariable() {
+        JwtSigningStringCallout callout = createCallout(new HashMap<>());
+
+        messageContext.setVariable("private.jwt.header.alg", "RS256");
+
+        String result = callout.resolveFlowVariables("ref:private.jwt.header.alg", messageContext);
+        assertEquals("RS256", result);
+    }
+
+    @Test
+    public void testRefPrefixMissingVariableReturnsEmpty() {
+        JwtSigningStringCallout callout = createCallout(new HashMap<>());
+
+        String result = callout.resolveFlowVariables("ref:missing.variable", messageContext);
+        assertEquals("", result);
+    }
+
+    @Test
+    public void testRefPrefixInHeaderProperties() {
+        Map<String, String> props = new HashMap<>();
+        props.put("header_alg", "ref:private.jwt.header.alg");
+        props.put("header_typ", "ref:private.jwt.header.typ");
+        props.put("header_kid", "ref:private.jwt.header.kid");
+        props.put("payload", "{\"sub\":\"test\"}");
+        JwtSigningStringCallout callout = createCallout(props);
+
+        messageContext.setVariable("private.jwt.header.alg", "RS256");
+        messageContext.setVariable("private.jwt.header.typ", "JWT");
+        messageContext.setVariable("private.jwt.header.kid", "key-abc");
+
+        ExecutionResult result = callout.execute(messageContext, executionContext);
+        assertEquals(ExecutionResult.SUCCESS, result);
+
+        String headerB64 = messageContext.getVariable("jwt_header_b64");
+        JSONObject header = new JSONObject(base64UrlDecode(headerB64));
+        assertEquals("RS256", header.getString("alg"));
+        assertEquals("JWT", header.getString("typ"));
+        assertEquals("key-abc", header.getString("kid"));
+    }
+
+    @Test
+    public void testRefPrefixNullVariableSkipsHeader() {
+        Map<String, String> props = new HashMap<>();
+        props.put("header_alg", "ref:private.jwt.header.alg");
+        props.put("header_kid", "ref:private.jwt.header.kid");
+        props.put("header_x5u", "ref:private.jwt.header.x5u");
+        props.put("payload", "{\"sub\":\"test\"}");
+        JwtSigningStringCallout callout = createCallout(props);
+
+        messageContext.setVariable("private.jwt.header.alg", "RS256");
+        messageContext.setVariable("private.jwt.header.kid", "key-123");
+        // x5u not set — should be skipped
+
+        ExecutionResult result = callout.execute(messageContext, executionContext);
+        assertEquals(ExecutionResult.SUCCESS, result);
+
+        String headerB64 = messageContext.getVariable("jwt_header_b64");
+        JSONObject header = new JSONObject(base64UrlDecode(headerB64));
+        assertEquals(2, header.length());
+        assertEquals("RS256", header.getString("alg"));
+        assertEquals("key-123", header.getString("kid"));
+        assertFalse("x5u should be absent when ref variable is null", header.has("x5u"));
+    }
+
+    @Test
+    public void testRefPrefixPayload() {
+        Map<String, String> props = new HashMap<>();
+        props.put("header_alg", "RS256");
+        props.put("payload", "ref:jwt.claims.json");
+        JwtSigningStringCallout callout = createCallout(props);
+
+        String claimsJson = "{\"sub\":\"ref-test\",\"iss\":\"my-issuer\"}";
+        messageContext.setVariable("jwt.claims.json", claimsJson);
+
+        ExecutionResult result = callout.execute(messageContext, executionContext);
+        assertEquals(ExecutionResult.SUCCESS, result);
+
+        String payloadB64 = messageContext.getVariable("jwt_payload_b64");
+        JSONObject payload = new JSONObject(base64UrlDecode(payloadB64));
+        assertEquals("ref-test", payload.getString("sub"));
+        assertEquals("my-issuer", payload.getString("iss"));
+    }
+
+    @Test
+    public void testRefPrefixAllHeadersFromKvm() {
+        Map<String, String> props = new HashMap<>();
+        props.put("header_alg", "ref:private.jwt.header.alg");
+        props.put("header_typ", "ref:private.jwt.header.typ");
+        props.put("header_kid", "ref:private.jwt.header.kid");
+        props.put("header_x5u", "ref:private.jwt.header.x5u");
+        props.put("crit_headers", "x5u");
+        props.put("payload", "ref:jwt.claims.json");
+        JwtSigningStringCallout callout = createCallout(props);
+
+        messageContext.setVariable("private.jwt.header.alg", "RS256");
+        messageContext.setVariable("private.jwt.header.typ", "JWT");
+        messageContext.setVariable("private.jwt.header.kid", "key-456");
+        messageContext.setVariable("private.jwt.header.x5u", "https://example.com/cert");
+        messageContext.setVariable("jwt.claims.json", "{\"sub\":\"full-test\"}");
+
+        ExecutionResult result = callout.execute(messageContext, executionContext);
+        assertEquals(ExecutionResult.SUCCESS, result);
+
+        String headerB64 = messageContext.getVariable("jwt_header_b64");
+        JSONObject header = new JSONObject(base64UrlDecode(headerB64));
+        assertEquals("RS256", header.getString("alg"));
+        assertEquals("JWT", header.getString("typ"));
+        assertEquals("key-456", header.getString("kid"));
+        assertEquals("https://example.com/cert", header.getString("x5u"));
+        assertTrue(header.has("crit"));
+
+        String signingString = messageContext.getVariable("jwt_signing_string");
+        String[] parts = signingString.split("\\.");
+        assertEquals(2, parts.length);
+    }
 }

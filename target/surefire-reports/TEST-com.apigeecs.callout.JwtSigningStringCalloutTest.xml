@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.081" tests="33" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.087" tests="39" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="25"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -12,7 +12,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="BE"/>
     <property name="sun.boot.library.path" value="/usr/local/Cellar/openjdk/25.0.2/libexec/openjdk.jdk/Contents/Home/lib"/>
-    <property name="sun.java.command" value="/Users/mohamedelbarouzi/Dev/Claude-code/Apigee-JavaCaloutEmss/jwt-generator/target/surefire/surefirebooter-20260225120307787_3.jar /Users/mohamedelbarouzi/Dev/Claude-code/Apigee-JavaCaloutEmss/jwt-generator/target/surefire 2026-02-25T12-03-07_698-jvmRun1 surefire-20260225120307787_1tmp surefire_0-20260225120307787_2tmp"/>
+    <property name="sun.java.command" value="/Users/mohamedelbarouzi/Dev/Claude-code/Apigee-JavaCaloutEmss/jwt-generator/target/surefire/surefirebooter-20260225144138284_3.jar /Users/mohamedelbarouzi/Dev/Claude-code/Apigee-JavaCaloutEmss/jwt-generator/target/surefire 2026-02-25T14-41-38_157-jvmRun1 surefire-20260225144138284_1tmp surefire_0-20260225144138284_2tmp"/>
     <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="/Users/mohamedelbarouzi/Dev/Claude-code/Apigee-JavaCaloutEmss/jwt-generator/target/test-classes:/Users/mohamedelbarouzi/Dev/Claude-code/Apigee-JavaCaloutEmss/jwt-generator/target/classes:/Users/mohamedelbarouzi/.m2/repository/com/apigee/edge/expressions/1.0.0/expressions-1.0.0.jar:/Users/mohamedelbarouzi/.m2/repository/com/apigee/edge/message-flow/1.0.0/message-flow-1.0.0.jar:/Users/mohamedelbarouzi/.m2/repository/org/json/json/20231013/json-20231013.jar:/Users/mohamedelbarouzi/.m2/repository/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar:/Users/mohamedelbarouzi/.m2/repository/junit/junit/4.13.2/junit-4.13.2.jar:/Users/mohamedelbarouzi/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:"/>
@@ -29,7 +29,7 @@
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="apple.awt.application.name" value="ForkedBooter"/>
-    <property name="surefire.real.class.path" value="/Users/mohamedelbarouzi/Dev/Claude-code/Apigee-JavaCaloutEmss/jwt-generator/target/surefire/surefirebooter-20260225120307787_3.jar"/>
+    <property name="surefire.real.class.path" value="/Users/mohamedelbarouzi/Dev/Claude-code/Apigee-JavaCaloutEmss/jwt-generator/target/surefire/surefirebooter-20260225144138284_3.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="java.runtime.version" value="25.0.2"/>
@@ -68,28 +68,34 @@
   <testcase name="testBasicSigningStringConstruction" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
   <testcase name="testBase64UrlEncodeNoPadding" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
   <testcase name="testBase64UrlEncodeRoundTrip" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
-  <testcase name="testFlowVariableResolutionInPayload" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
+  <testcase name="testFlowVariableResolutionInPayload" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testRefPrefixMissingVariableReturnsEmpty" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
   <testcase name="testSigningStringFormat" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
-  <testcase name="testBase64UrlEncodeUrlSafe" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
+  <testcase name="testBase64UrlEncodeUrlSafe" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
   <testcase name="testDynamicHeaderConstruction" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
   <testcase name="testHeaderWithEmptyFlowVariableSkipped" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
   <testcase name="testEmptyPayload_ReturnsAbort" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
-  <testcase name="testCustomOutputVariableNames" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.003"/>
-  <testcase name="testAllHeadersFromKvmPresent" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
+  <testcase name="testCustomOutputVariableNames" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testRefPrefixNullVariableSkipsHeader" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testAllHeadersFromKvmPresent" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testRefPrefixResolvesFlowVariable" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
   <testcase name="testEmptyCritHeaders_NoError" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
   <testcase name="testFlowVariableResolutionInline" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
-  <testcase name="testCritHeadersMultiple" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testCritHeadersMultiple" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
   <testcase name="testFlowVariableResolutionNull" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
-  <testcase name="testCritHeadersPositive" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
-  <testcase name="testHeaderPropertyWithEmptyNameIgnored" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testCritHeadersPositive" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testHeaderPropertyWithEmptyNameIgnored" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
   <testcase name="testNoCritHeadersProperty_NoError" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
   <testcase name="testDefaultOutputVariableNames" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
   <testcase name="testPayloadFlowVariableResolvesToEmpty_ReturnsAbort" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
-  <testcase name="testFlowVariableResolutionMissingVariable" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
-  <testcase name="testFlowVariableResolutionInHeaderValues" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testFlowVariableResolutionMissingVariable" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testFlowVariableResolutionInHeaderValues" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
   <testcase name="testFlowVariableResolutionNoVariables" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
-  <testcase name="testErrorClearedOnSuccess" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testErrorClearedOnSuccess" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
+  <testcase name="testRefPrefixAllHeadersFromKvm" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
   <testcase name="testBase64UrlEncodeEmptyString" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
-  <testcase name="testSigningStringDecodesCorrectly" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
+  <testcase name="testSigningStringDecodesCorrectly" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testRefPrefixPayload" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testRefPrefixInHeaderProperties" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
   <testcase name="testBase64UrlEncodeKnownValue" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
 </testsuite>

@@ -261,11 +261,18 @@ public class JwtSigningStringCallout implements Execution {
         return resolveFlowVariables(value, messageContext);
     }
 
+    /** Prefix indicating a property value is a flow variable name to be resolved at runtime. */
+    private static final String REF_PREFIX = "ref:";
+
     /**
-     * Resolves flow variable references in the given string. References are denoted
-     * by {@code {variableName}} and are replaced with the corresponding value from the
-     * {@link MessageContext}. If the entire string is a single variable reference,
-     * the raw variable value is returned (supporting non-string types).
+     * Resolves flow variable references in the given string. Supports two modes:
+     * <ul>
+     *   <li><b>{@code ref:variableName}</b> &mdash; The value after {@code ref:} is treated as a
+     *       flow variable name and looked up directly from the {@link MessageContext}.
+     *       This avoids relying on Apigee's property-level variable resolution.</li>
+     *   <li><b>{@code {variableName}}</b> &mdash; Inline references wrapped in curly braces
+     *       are replaced with the corresponding value from the {@link MessageContext}.</li>
+     * </ul>
      *
      * @param input          the input string potentially containing flow variable references
      * @param messageContext the message context to resolve variables from
@@ -274,6 +281,16 @@ public class JwtSigningStringCallout implements Execution {
     String resolveFlowVariables(String input, MessageContext messageContext) {
         if (input == null) {
             return null;
+        }
+
+        // Support "ref:variableName" — direct flow variable lookup
+        if (input.startsWith(REF_PREFIX)) {
+            String varName = input.substring(REF_PREFIX.length()).trim();
+            if (!varName.isEmpty()) {
+                Object value = messageContext.getVariable(varName);
+                return value != null ? value.toString() : "";
+            }
+            return "";
         }
 
         // Check if the entire string is a single flow variable reference
