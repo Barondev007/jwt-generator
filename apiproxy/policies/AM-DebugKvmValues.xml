@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+    Debug policy to inspect KVM values after retrieval.
+    Assigns all KVM-retrieved flow variables into a single JSON debug payload
+    stored in flow variable "debug.kvm.values".
+
+    Remove or disable this policy before deploying to production.
+-->
+<AssignMessage name="AM-DebugKvmValues">
+    <DisplayName>AM - Debug KVM Values</DisplayName>
+    <AssignVariable>
+        <Name>debug.kvm.values</Name>
+        <Template>{
+  "jwt_headers": {
+    "kid": "{private.jwt.header.kid}",
+    "alg": "{private.jwt.header.alg}",
+    "typ": "{private.jwt.header.typ}",
+    "x5u": "{private.jwt.header.x5u}"
+  },
+  "signing_service_config": {
+    "idp.token.url": "{private.idp.token.url}",
+    "idp.client.id": "{private.idp.client.id}",
+    "idp.keystore.name": "{private.idp.keystore.name}",
+    "idp.keyalias.name": "{private.idp.keyalias.name}",
+    "signing.service.url": "{private.signing.service.url}"
+  },
+  "proxy_name": "{apiproxy.name}"
+}</Template>
+    </AssignVariable>
+    <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</AssignMessage>
