@@ -1,0 +1,3 @@
+com/apigeecs/callout/JwtSigningStringCalloutTest.class
+com/apigeecs/callout/FakeMessageContext.class
+com/apigeecs/callout/FakeExecutionContext.class

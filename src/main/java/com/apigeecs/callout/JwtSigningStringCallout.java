@@ -5,9 +5,6 @@ import com.apigee.flow.execution.ExecutionResult;
 import com.apigee.flow.execution.spi.Execution;
 import com.apigee.flow.message.MessageContext;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -24,11 +21,15 @@ import java.util.regex.Pattern;
  * <p>The resulting signing string is intended to be sent via a Service Callout
  * to an external signing service that will produce the final JWS signature.
  *
+ * <p><strong>Zero third-party dependencies</strong> &mdash; JSON is built manually
+ * to avoid classloader conflicts on the Apigee runtime.
+ *
  * <h3>Configuration Properties</h3>
  * <ul>
  *   <li>{@code header_*} &mdash; Dynamic JOSE header parameters. Any property whose name
  *       starts with the configured prefix (default {@code header_}) is treated as a header
- *       name/value pair. For example, {@code header_alg=RS256} produces {@code {"alg":"RS256"}}.</li>
+ *       name/value pair. For example, {@code header_alg=RS256} produces {@code {"alg":"RS256"}}.
+ *       Properties whose values resolve to null or empty are silently skipped.</li>
  *   <li>{@code header-prefix} &mdash; Override the default prefix for header properties
  *       (default: {@code header_}).</li>
  *   <li>{@code crit_headers} &mdash; Comma-separated list of critical header names to include
@@ -92,22 +93,25 @@ public class JwtSigningStringCallout implements Execution {
             String headerPrefix = resolveProperty("header-prefix", DEFAULT_HEADER_PREFIX, messageContext);
 
             // --- Build JOSE header ---
-            JSONObject joseHeader = buildJoseHeader(headerPrefix, messageContext);
+            Map<String, String> headerParams = buildJoseHeader(headerPrefix, messageContext);
 
-            if (joseHeader.length() == 0) {
+            if (headerParams.isEmpty()) {
                 return abort(messageContext, errorVariable,
                         "No JOSE header parameters found. "
                         + "Configure properties with the prefix '" + headerPrefix + "'.");
             }
 
             // --- Process crit headers ---
-            processCritHeaders(joseHeader, messageContext);
+            List<String> critList = processCritHeaders(headerParams, messageContext);
+
+            // --- Build header JSON string ---
+            String headerJson = buildHeaderJson(headerParams, critList);
 
             // --- Resolve and validate payload ---
             String payloadJson = resolvePayload(messageContext);
 
             // --- Base64URL encode ---
-            String headerB64 = base64UrlEncode(joseHeader.toString());
+            String headerB64 = base64UrlEncode(headerJson);
             String payloadB64 = base64UrlEncode(payloadJson);
             String signingString = headerB64 + "." + payloadB64;
 
@@ -130,17 +134,16 @@ public class JwtSigningStringCallout implements Execution {
     }
 
     /**
-     * Builds the JOSE header JSON object by collecting all properties that start
+     * Builds the JOSE header parameters by collecting all properties that start
      * with the configured prefix. Header properties whose values resolve to null
      * or empty are silently skipped, allowing a superset of headers to be configured
      * while only including those with actual values (e.g., from KVM lookups).
      *
      * @param headerPrefix   the prefix identifying header properties
      * @param messageContext  the message context for resolving flow variables
-     * @return a {@link JSONObject} containing the JOSE header parameters
+     * @return an ordered map of header name to value (sorted alphabetically for consistency)
      */
-    JSONObject buildJoseHeader(String headerPrefix, MessageContext messageContext) {
-        // Use TreeMap for consistent ordering in tests
+    Map<String, String> buildJoseHeader(String headerPrefix, MessageContext messageContext) {
         Map<String, String> headerParams = new TreeMap<>();
 
         for (Map.Entry<String, String> entry : properties.entrySet()) {
@@ -156,35 +159,33 @@ public class JwtSigningStringCallout implements Execution {
             }
         }
 
-        JSONObject header = new JSONObject();
-        for (Map.Entry<String, String> entry : headerParams.entrySet()) {
-            header.put(entry.getKey(), entry.getValue());
-        }
-        return header;
+        return headerParams;
     }
 
     /**
      * Processes the {@code crit_headers} property: validates that each listed critical
-     * header is present in the JOSE header, then adds the {@code "crit"} array.
+     * header is present in the JOSE header and returns the list of critical header names.
      *
-     * @param joseHeader     the constructed JOSE header (modified in place)
+     * @param headerParams   the constructed JOSE header parameters
      * @param messageContext  the message context for resolving flow variables
+     * @return list of critical header names, or empty list if none configured
      * @throws IllegalArgumentException if a critical header is not present in the JOSE header
      */
-    void processCritHeaders(JSONObject joseHeader, MessageContext messageContext) {
+    List<String> processCritHeaders(Map<String, String> headerParams, MessageContext messageContext) {
+        List<String> critList = new ArrayList<>();
+
         String critProperty = properties.get("crit_headers");
         if (critProperty == null || critProperty.trim().isEmpty()) {
-            return;
+            return critList;
         }
 
         String resolved = resolveFlowVariables(critProperty, messageContext);
         String[] critNames = resolved.split(",");
-        List<String> critList = new ArrayList<>();
 
         for (String name : critNames) {
             String trimmed = name.trim();
             if (!trimmed.isEmpty()) {
-                if (!joseHeader.has(trimmed)) {
+                if (!headerParams.containsKey(trimmed)) {
                     throw new IllegalArgumentException(
                             "Critical header '" + trimmed + "' is listed in crit_headers "
                             + "but is not present in the JOSE header.");
@@ -193,14 +194,86 @@ public class JwtSigningStringCallout implements Execution {
             }
         }
 
-        if (!critList.isEmpty()) {
-            joseHeader.put("crit", critList);
+        return critList;
+    }
+
+    /**
+     * Builds a JSON string from the header parameters and optional crit list.
+     * JSON is built manually to avoid any third-party library dependencies.
+     *
+     * @param headerParams the JOSE header key-value pairs
+     * @param critList     the list of critical headers (may be empty)
+     * @return a valid JSON object string
+     */
+    String buildHeaderJson(Map<String, String> headerParams, List<String> critList) {
+        StringBuilder sb = new StringBuilder("{");
+        boolean first = true;
+
+        for (Map.Entry<String, String> entry : headerParams.entrySet()) {
+            if (!first) {
+                sb.append(",");
+            }
+            sb.append("\"").append(jsonEscape(entry.getKey())).append("\"");
+            sb.append(":");
+            sb.append("\"").append(jsonEscape(entry.getValue())).append("\"");
+            first = false;
         }
+
+        if (!critList.isEmpty()) {
+            if (!first) {
+                sb.append(",");
+            }
+            sb.append("\"crit\":[");
+            for (int i = 0; i < critList.size(); i++) {
+                if (i > 0) {
+                    sb.append(",");
+                }
+                sb.append("\"").append(jsonEscape(critList.get(i))).append("\"");
+            }
+            sb.append("]");
+        }
+
+        sb.append("}");
+        return sb.toString();
+    }
+
+    /**
+     * Escapes a string for safe inclusion in a JSON value.
+     * Handles the characters required by RFC 8259.
+     *
+     * @param value the raw string
+     * @return the JSON-escaped string
+     */
+    static String jsonEscape(String value) {
+        if (value == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder(value.length());
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            switch (c) {
+                case '"':  sb.append("\\\""); break;
+                case '\\': sb.append("\\\\"); break;
+                case '\b': sb.append("\\b");  break;
+                case '\f': sb.append("\\f");  break;
+                case '\n': sb.append("\\n");  break;
+                case '\r': sb.append("\\r");  break;
+                case '\t': sb.append("\\t");  break;
+                default:
+                    if (c < 0x20) {
+                        sb.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        sb.append(c);
+                    }
+            }
+        }
+        return sb.toString();
     }
 
     /**
      * Resolves the JWT payload from the configured {@code payload} property.
      * The property value may be a literal JSON string or a flow variable reference.
+     * Validates that the resolved payload looks like a JSON object (starts with '{').
      *
      * @param messageContext the message context for resolving flow variables
      * @return the payload JSON string
@@ -220,12 +293,11 @@ public class JwtSigningStringCallout implements Execution {
                     + "Check the flow variable reference in the 'payload' property.");
         }
 
-        // Validate that the payload is valid JSON
-        try {
-            new JSONObject(resolved);
-        } catch (JSONException e) {
+        // Basic JSON object validation (must start and end with braces)
+        String trimmed = resolved.trim();
+        if (!trimmed.startsWith("{") || !trimmed.endsWith("}")) {
             throw new IllegalArgumentException(
-                    "The payload is not valid JSON: " + e.getMessage());
+                    "The payload is not valid JSON: must be a JSON object starting with '{' and ending with '}'.");
         }
 
         return resolved;

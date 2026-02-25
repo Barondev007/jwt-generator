@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.079" tests="38" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="25"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/Users/mohamedelbarouzi/Dev/Claude-code/Apigee-JavaCaloutEmss/jwt-generator/target/test-classes:/Users/mohamedelbarouzi/Dev/Claude-code/Apigee-JavaCaloutEmss/jwt-generator/target/classes:/Users/mohamedelbarouzi/.m2/repository/com/apigee/edge/expressions/1.0.0/expressions-1.0.0.jar:/Users/mohamedelbarouzi/.m2/repository/com/apigee/edge/message-flow/1.0.0/message-flow-1.0.0.jar:/Users/mohamedelbarouzi/.m2/repository/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar:/Users/mohamedelbarouzi/.m2/repository/junit/junit/4.13.2/junit-4.13.2.jar:/Users/mohamedelbarouzi/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:"/>
+    <property name="java.vm.vendor" value="Homebrew"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://github.com/Homebrew/homebrew-core/issues"/>
+    <property name="os.name" value="Mac OS X"/>
+    <property name="java.vm.specification.version" value="25"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="BE"/>
+    <property name="sun.boot.library.path" value="/usr/local/Cellar/openjdk/25.0.2/libexec/openjdk.jdk/Contents/Home/lib"/>
+    <property name="sun.java.command" value="/Users/mohamedelbarouzi/Dev/Claude-code/Apigee-JavaCaloutEmss/jwt-generator/target/surefire/surefirebooter-20260225114449913_3.jar /Users/mohamedelbarouzi/Dev/Claude-code/Apigee-JavaCaloutEmss/jwt-generator/target/surefire 2026-02-25T11-44-49_805-jvmRun1 surefire-20260225114449913_1tmp surefire_0-20260225114449913_2tmp"/>
+    <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/Users/mohamedelbarouzi/Dev/Claude-code/Apigee-JavaCaloutEmss/jwt-generator/target/test-classes:/Users/mohamedelbarouzi/Dev/Claude-code/Apigee-JavaCaloutEmss/jwt-generator/target/classes:/Users/mohamedelbarouzi/.m2/repository/com/apigee/edge/expressions/1.0.0/expressions-1.0.0.jar:/Users/mohamedelbarouzi/.m2/repository/com/apigee/edge/message-flow/1.0.0/message-flow-1.0.0.jar:/Users/mohamedelbarouzi/.m2/repository/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar:/Users/mohamedelbarouzi/.m2/repository/junit/junit/4.13.2/junit-4.13.2.jar:/Users/mohamedelbarouzi/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/Users/mohamedelbarouzi"/>
+    <property name="user.language" value="fr"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2026-01-20"/>
+    <property name="java.home" value="/usr/local/Cellar/openjdk/25.0.2/libexec/openjdk.jdk/Contents/Home"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/Users/mohamedelbarouzi/Dev/Claude-code/Apigee-JavaCaloutEmss/jwt-generator"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="apple.awt.application.name" value="ForkedBooter"/>
+    <property name="surefire.real.class.path" value="/Users/mohamedelbarouzi/Dev/Claude-code/Apigee-JavaCaloutEmss/jwt-generator/target/surefire/surefirebooter-20260225114449913_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="java.runtime.version" value="25.0.2"/>
+    <property name="user.name" value="mohamedelbarouzi"/>
+    <property name="stdout.encoding" value="UTF-8"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="26.3"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Homebrew"/>
+    <property name="localRepository" value="/Users/mohamedelbarouzi/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/Homebrew/homebrew-core/issues"/>
+    <property name="java.io.tmpdir" value="/var/folders/xj/196c_tl11m592nky8kb256ph0000gn/T/"/>
+    <property name="java.version" value="25.0.2"/>
+    <property name="user.dir" value="/Users/mohamedelbarouzi/Dev/Claude-code/Apigee-JavaCaloutEmss/jwt-generator"/>
+    <property name="os.arch" value="x86_64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/Users/mohamedelbarouzi/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="UTF-8"/>
+    <property name="java.vendor" value="Homebrew"/>
+    <property name="java.vm.version" value="25.0.2"/>
+    <property name="stdin.encoding" value="UTF-8"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeBig"/>
+    <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="java.class.version" value="69.0"/>
+  </properties>
+  <testcase name="testCustomHeaderPrefix" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.008"/>
+  <testcase name="testNoHeaderProperties_ReturnsAbort" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testMissingPayload_ReturnsAbort" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testInvalidPayloadJson_ReturnsAbort" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testHeaderWithNullFlowVariableSkipped" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testCritHeaderMissing_ReturnsAbort" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testBasicSigningStringConstruction" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testBase64UrlEncodeNoPadding" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testJsonEscape_Null" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testBase64UrlEncodeRoundTrip" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testFlowVariableResolutionInPayload" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testSigningStringFormat" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testBase64UrlEncodeUrlSafe" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testDynamicHeaderConstruction" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testHeaderWithEmptyFlowVariableSkipped" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testEmptyPayload_ReturnsAbort" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testCustomOutputVariableNames" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testAllHeadersFromKvmPresent" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
+  <testcase name="testEmptyCritHeaders_NoError" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testFlowVariableResolutionInline" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testCritHeadersMultiple" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
+  <testcase name="testFlowVariableResolutionNull" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testCritHeadersPositive" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
+  <testcase name="testHeaderPropertyWithEmptyNameIgnored" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testNoCritHeadersProperty_NoError" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testDefaultOutputVariableNames" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testPayloadFlowVariableResolvesToEmpty_ReturnsAbort" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testFlowVariableResolutionMissingVariable" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
+  <testcase name="testJsonEscape_NoEscaping" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testBuildHeaderJson_WithCrit" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testFlowVariableResolutionInHeaderValues" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
+  <testcase name="testBuildHeaderJson_Simple" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testJsonEscape_SpecialChars" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testFlowVariableResolutionNoVariables" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testErrorClearedOnSuccess" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testBase64UrlEncodeEmptyString" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+  <testcase name="testSigningStringDecodesCorrectly" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.001"/>
+  <testcase name="testBase64UrlEncodeKnownValue" classname="com.apigeecs.callout.JwtSigningStringCalloutTest" time="0.0"/>
+</testsuite>
