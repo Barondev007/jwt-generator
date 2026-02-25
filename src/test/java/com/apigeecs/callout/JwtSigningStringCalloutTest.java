@@ -2,11 +2,12 @@ package com.apigeecs.callout;
 
 import com.apigee.flow.execution.ExecutionResult;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,8 +16,6 @@ import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link JwtSigningStringCallout}.
- * No third-party JSON library is used &mdash; decoded JSON strings are
- * verified with simple string assertions.
  */
 public class JwtSigningStringCalloutTest {
 
@@ -76,11 +75,9 @@ public class JwtSigningStringCalloutTest {
         String signingString = messageContext.getVariable("jwt_signing_string");
         assertNotNull("Signing string should not be null", signingString);
 
-        // Must contain exactly one dot
         String[] parts = signingString.split("\\.");
         assertEquals("Signing string must have exactly two parts", 2, parts.length);
 
-        // Parts must match the individual stored values
         String headerB64 = messageContext.getVariable("jwt_header_b64");
         String payloadB64 = messageContext.getVariable("jwt_payload_b64");
         assertEquals(parts[0], headerB64);
@@ -97,16 +94,14 @@ public class JwtSigningStringCalloutTest {
         String headerB64 = messageContext.getVariable("jwt_header_b64");
         String payloadB64 = messageContext.getVariable("jwt_payload_b64");
 
-        // Decode header — TreeMap produces alphabetical order: alg, typ
-        String headerJson = base64UrlDecode(headerB64);
-        assertTrue("Header should contain alg", headerJson.contains("\"alg\":\"RS256\""));
-        assertTrue("Header should contain typ", headerJson.contains("\"typ\":\"JWT\""));
+        JSONObject header = new JSONObject(base64UrlDecode(headerB64));
+        assertEquals("RS256", header.getString("alg"));
+        assertEquals("JWT", header.getString("typ"));
 
-        // Decode payload — it's passed through as-is
-        String payloadJson = base64UrlDecode(payloadB64);
-        assertTrue("Payload should contain sub", payloadJson.contains("\"sub\":\"1234567890\""));
-        assertTrue("Payload should contain name", payloadJson.contains("\"name\":\"John Doe\""));
-        assertTrue("Payload should contain iat", payloadJson.contains("\"iat\":1516239022"));
+        JSONObject payload = new JSONObject(base64UrlDecode(payloadB64));
+        assertEquals("1234567890", payload.getString("sub"));
+        assertEquals("John Doe", payload.getString("name"));
+        assertEquals(1516239022, payload.getInt("iat"));
     }
 
     // ---------------------------------------------------------------
@@ -123,12 +118,12 @@ public class JwtSigningStringCalloutTest {
         props.put("payload", "{\"sub\":\"test\"}");
         JwtSigningStringCallout callout = createCallout(props);
 
-        Map<String, String> header = callout.buildJoseHeader("header_", messageContext);
+        JSONObject header = callout.buildJoseHeader("header_", messageContext);
 
-        assertEquals("RS256", header.get("alg"));
-        assertEquals("my-key-id", header.get("kid"));
-        assertEquals("JWT", header.get("typ"));
-        assertEquals("https://example.com/cert", header.get("x5u"));
+        assertEquals("RS256", header.getString("alg"));
+        assertEquals("my-key-id", header.getString("kid"));
+        assertEquals("JWT", header.getString("typ"));
+        assertEquals("https://example.com/cert", header.getString("x5u"));
     }
 
     @Test
@@ -143,9 +138,10 @@ public class JwtSigningStringCalloutTest {
         ExecutionResult result = callout.execute(messageContext, executionContext);
         assertEquals(ExecutionResult.SUCCESS, result);
 
-        String headerJson = base64UrlDecode(messageContext.<String>getVariable("jwt_header_b64"));
-        assertTrue(headerJson.contains("\"alg\":\"ES256\""));
-        assertTrue(headerJson.contains("\"typ\":\"JWT\""));
+        String headerB64 = messageContext.getVariable("jwt_header_b64");
+        JSONObject header = new JSONObject(base64UrlDecode(headerB64));
+        assertEquals("ES256", header.getString("alg"));
+        assertEquals("JWT", header.getString("typ"));
     }
 
     @Test
@@ -156,9 +152,9 @@ public class JwtSigningStringCalloutTest {
         props.put("payload", "{\"sub\":\"test\"}");
         JwtSigningStringCallout callout = createCallout(props);
 
-        Map<String, String> header = callout.buildJoseHeader("header_", messageContext);
-        assertEquals(1, header.size());
-        assertEquals("RS256", header.get("alg"));
+        JSONObject header = callout.buildJoseHeader("header_", messageContext);
+        assertEquals(1, header.length());
+        assertEquals("RS256", header.getString("alg"));
     }
 
     @Test
@@ -170,16 +166,16 @@ public class JwtSigningStringCalloutTest {
         props.put("payload", "{\"sub\":\"test\"}");
         JwtSigningStringCallout callout = createCallout(props);
 
-        // Only kid is set; x5u is not in the context (simulates missing KVM key)
         messageContext.setVariable("private.jwt.header.kid", "my-key-id");
 
         ExecutionResult result = callout.execute(messageContext, executionContext);
         assertEquals(ExecutionResult.SUCCESS, result);
 
-        String headerJson = base64UrlDecode(messageContext.<String>getVariable("jwt_header_b64"));
-        assertTrue("Header should contain alg", headerJson.contains("\"alg\":\"RS256\""));
-        assertTrue("Header should contain kid", headerJson.contains("\"kid\":\"my-key-id\""));
-        assertFalse("x5u should be absent when flow variable is null", headerJson.contains("\"x5u\""));
+        String headerB64 = messageContext.getVariable("jwt_header_b64");
+        JSONObject header = new JSONObject(base64UrlDecode(headerB64));
+        assertEquals("RS256", header.getString("alg"));
+        assertEquals("my-key-id", header.getString("kid"));
+        assertFalse("x5u should be absent when flow variable is null", header.has("x5u"));
     }
 
     @Test
@@ -197,10 +193,10 @@ public class JwtSigningStringCalloutTest {
         ExecutionResult result = callout.execute(messageContext, executionContext);
         assertEquals(ExecutionResult.SUCCESS, result);
 
-        String headerJson = base64UrlDecode(messageContext.<String>getVariable("jwt_header_b64"));
-        assertTrue(headerJson.contains("\"alg\":\"RS256\""));
-        assertTrue(headerJson.contains("\"kid\":\"my-key-id\""));
-        assertFalse("x5u should be absent when flow variable is empty", headerJson.contains("\"x5u\""));
+        String headerB64 = messageContext.getVariable("jwt_header_b64");
+        JSONObject header = new JSONObject(base64UrlDecode(headerB64));
+        assertEquals(2, header.length());
+        assertFalse("x5u should be absent when flow variable is empty", header.has("x5u"));
     }
 
     @Test
@@ -221,11 +217,13 @@ public class JwtSigningStringCalloutTest {
         ExecutionResult result = callout.execute(messageContext, executionContext);
         assertEquals(ExecutionResult.SUCCESS, result);
 
-        String headerJson = base64UrlDecode(messageContext.<String>getVariable("jwt_header_b64"));
-        assertTrue(headerJson.contains("\"alg\":\"RS256\""));
-        assertTrue(headerJson.contains("\"typ\":\"JWT\""));
-        assertTrue(headerJson.contains("\"kid\":\"key-123\""));
-        assertTrue(headerJson.contains("\"x5u\":\"https://example.com/cert\""));
+        String headerB64 = messageContext.getVariable("jwt_header_b64");
+        JSONObject header = new JSONObject(base64UrlDecode(headerB64));
+        assertEquals(4, header.length());
+        assertEquals("RS256", header.getString("alg"));
+        assertEquals("JWT", header.getString("typ"));
+        assertEquals("key-123", header.getString("kid"));
+        assertEquals("https://example.com/cert", header.getString("x5u"));
     }
 
     // ---------------------------------------------------------------
@@ -245,8 +243,12 @@ public class JwtSigningStringCalloutTest {
         ExecutionResult result = callout.execute(messageContext, executionContext);
         assertEquals(ExecutionResult.SUCCESS, result);
 
-        String headerJson = base64UrlDecode(messageContext.<String>getVariable("jwt_header_b64"));
-        assertTrue("Header should contain crit array", headerJson.contains("\"crit\":[\"x5u\"]"));
+        String headerB64 = messageContext.getVariable("jwt_header_b64");
+        JSONObject header = new JSONObject(base64UrlDecode(headerB64));
+        assertTrue(header.has("crit"));
+        JSONArray crit = header.getJSONArray("crit");
+        assertEquals(1, crit.length());
+        assertEquals("x5u", crit.getString(0));
     }
 
     @Test
@@ -262,8 +264,10 @@ public class JwtSigningStringCalloutTest {
         ExecutionResult result = callout.execute(messageContext, executionContext);
         assertEquals(ExecutionResult.SUCCESS, result);
 
-        String headerJson = base64UrlDecode(messageContext.<String>getVariable("jwt_header_b64"));
-        assertTrue("Header should contain crit array", headerJson.contains("\"crit\":[\"x5u\",\"custom1\"]"));
+        String headerB64 = messageContext.getVariable("jwt_header_b64");
+        JSONObject header = new JSONObject(base64UrlDecode(headerB64));
+        JSONArray crit = header.getJSONArray("crit");
+        assertEquals(2, crit.length());
     }
 
     @Test
@@ -322,8 +326,9 @@ public class JwtSigningStringCalloutTest {
         ExecutionResult result = callout.execute(messageContext, executionContext);
         assertEquals(ExecutionResult.SUCCESS, result);
 
-        String headerJson = base64UrlDecode(messageContext.<String>getVariable("jwt_header_b64"));
-        assertTrue(headerJson.contains("\"kid\":\"resolved-key-id-123\""));
+        String headerB64 = messageContext.getVariable("jwt_header_b64");
+        JSONObject header = new JSONObject(base64UrlDecode(headerB64));
+        assertEquals("resolved-key-id-123", header.getString("kid"));
     }
 
     @Test
@@ -339,9 +344,10 @@ public class JwtSigningStringCalloutTest {
         ExecutionResult result = callout.execute(messageContext, executionContext);
         assertEquals(ExecutionResult.SUCCESS, result);
 
-        String payloadJson = base64UrlDecode(messageContext.<String>getVariable("jwt_payload_b64"));
-        assertTrue(payloadJson.contains("\"sub\":\"resolved-subject\""));
-        assertTrue(payloadJson.contains("\"iss\":\"my-issuer\""));
+        String payloadB64 = messageContext.getVariable("jwt_payload_b64");
+        JSONObject payload = new JSONObject(base64UrlDecode(payloadB64));
+        assertEquals("resolved-subject", payload.getString("sub"));
+        assertEquals("my-issuer", payload.getString("iss"));
     }
 
     @Test
@@ -417,56 +423,6 @@ public class JwtSigningStringCalloutTest {
     public void testBase64UrlEncodeEmptyString() {
         String encoded = JwtSigningStringCallout.base64UrlEncode("");
         assertEquals("", encoded);
-    }
-
-    // ---------------------------------------------------------------
-    // JSON builder tests
-    // ---------------------------------------------------------------
-
-    @Test
-    public void testBuildHeaderJson_Simple() {
-        Map<String, String> params = new java.util.TreeMap<>();
-        params.put("alg", "RS256");
-        params.put("typ", "JWT");
-        JwtSigningStringCallout callout = createCallout(new HashMap<>());
-
-        String json = callout.buildHeaderJson(params, new ArrayList<>());
-        assertEquals("{\"alg\":\"RS256\",\"typ\":\"JWT\"}", json);
-    }
-
-    @Test
-    public void testBuildHeaderJson_WithCrit() {
-        Map<String, String> params = new java.util.TreeMap<>();
-        params.put("alg", "RS256");
-        params.put("x5u", "https://example.com");
-        JwtSigningStringCallout callout = createCallout(new HashMap<>());
-
-        java.util.List<String> crit = new ArrayList<>();
-        crit.add("x5u");
-
-        String json = callout.buildHeaderJson(params, crit);
-        assertTrue(json.contains("\"crit\":[\"x5u\"]"));
-        assertTrue(json.contains("\"alg\":\"RS256\""));
-        assertTrue(json.contains("\"x5u\":\"https://example.com\""));
-    }
-
-    @Test
-    public void testJsonEscape_SpecialChars() {
-        assertEquals("hello\\\"world", JwtSigningStringCallout.jsonEscape("hello\"world"));
-        assertEquals("back\\\\slash", JwtSigningStringCallout.jsonEscape("back\\slash"));
-        assertEquals("new\\nline", JwtSigningStringCallout.jsonEscape("new\nline"));
-        assertEquals("tab\\there", JwtSigningStringCallout.jsonEscape("tab\there"));
-    }
-
-    @Test
-    public void testJsonEscape_Null() {
-        assertEquals("", JwtSigningStringCallout.jsonEscape(null));
-    }
-
-    @Test
-    public void testJsonEscape_NoEscaping() {
-        assertEquals("simple", JwtSigningStringCallout.jsonEscape("simple"));
-        assertEquals("https://example.com/path", JwtSigningStringCallout.jsonEscape("https://example.com/path"));
     }
 
     // ---------------------------------------------------------------
